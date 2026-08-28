@@ -1,0 +1,76 @@
+<!DOCTYPE html><html><head>
+<!-- Utmify Pixel -->
+<script>
+  window.pixelId = "6a90cccf72609acf4edce4ab";
+
+  var script = document.createElement("script");
+  script.src = "https://cdn.utmify.com.br/scripts/pixel/pixel.js";
+  script.async = true;
+  script.defer = true;
+
+  document.head.appendChild(script);
+</script>
+
+<!-- Utmify UTM Tracker -->
+<script
+  src="https://cdn.utmify.com.br/scripts/utms/latest.js"
+  data-utmify-prevent-xcod-sck
+  data-utmify-prevent-subids
+  async
+  defer>
+</script>
+
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1004588615929646');
+fbq('track', 'PageView');
+</script>
+
+<!-- End Meta Pixel Code -->
+
+  <meta charset="UTF-8">
+  <script>
+    const urls = [
+      "/up1/",
+      "/up2/",
+      "/up3/",
+      "/up4/",
+      "/up5/",
+      "/up6/",
+      "/up7/"
+    ];
+
+    const key = "redirectCount";
+    const count = parseInt(localStorage.getItem(key)) || 0;
+    localStorage.setItem(key, count + 1);
+
+    // Pega os parâmetros da URL e cria um objeto para manipulá-los
+    const params = new URLSearchParams(location.search);
+
+    // Remove o parâmetro "name"
+    params.delete('name');
+
+    // Converte os parâmetros de volta para uma string
+    const newParams = params.toString();
+
+    // Adiciona o "?" no início da string de parâmetros, se houver algum
+    const finalParams = newParams ? '?' + newParams : '';
+
+    const nextUrl = urls[count % urls.length] + finalParams;
+
+    location.href = nextUrl;
+  </script>
+</head>
+<body>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1004588615929646&ev=PageView&noscript=1" /></noscript>
+
+
+</body></html>
