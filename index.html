@@ -1037,6 +1037,20 @@ fbq('track', 'PageView');
     function irParaCheckout() {
       const current = tiers[currentTierIndex];
       if (current && current.link) {
+
+        // Meta Ads: marca o início do checkout sem registrar uma venda antes da aprovação.
+        try {
+          if (typeof fbq === 'function') {
+            const valorCheckout = parseFloat(String(current.preco).replace('.', '').replace(',', '.'));
+            fbq('track', 'InitiateCheckout', {
+              value: isNaN(valorCheckout) ? 0 : valorCheckout,
+              currency: 'BRL',
+              content_name: current.qtd + ' números'
+            });
+          }
+        } catch (e) {}
+
+        // Mantém as UTMs/IDs da campanha no link enviado ao checkout.
         const fullUrl = window.buildCheckoutUrl ? window.buildCheckoutUrl(current.link) : current.link + (window.location.search || '');
         window.location.href = fullUrl;
       }
