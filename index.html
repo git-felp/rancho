@@ -889,6 +889,47 @@
     });
   </script>
 
+  <script>
+(function () {
+    const p = new URLSearchParams(window.location.search);
+
+    const campos = [
+        "utm_source",
+        "utm_campaign",
+        "utm_content",
+        "campaign_id",
+        "adset_id",
+        "ad_id",
+        "campaign_name",
+        "adset_name",
+        "ad_name",
+        "placement",
+        "fbclid"
+    ];
+
+    campos.forEach(function(campo) {
+        const valor = p.get(campo);
+
+        if (valor) {
+            localStorage.setItem("meta_" + campo, valor);
+        }
+    });
+
+    window.metaTracking = function () {
+        const dados = {};
+
+        campos.forEach(function(campo) {
+            dados[campo] =
+                localStorage.getItem("meta_" + campo) || "";
+        });
+
+        return dados;
+    };
+})();
+</script>
+
+  
+  
   <script src="js/latest.js" data-utmify-prevent-subids="" async="" defer=""></script>
 </body>
 </html>
