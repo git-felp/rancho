@@ -3,64 +3,6 @@
 <head>
 <!-- UTM Tracking and Checkout Link Builder -->
 <script>
-// Função global para redirecionar para o checkout com todos os parâmetros de UTM na URL
-function irParaCheckout(urlCheckout) {
-  try {
-    let target = urlCheckout;
-    if (!target) {
-      if (typeof tiers !== 'undefined' && typeof currentTierIndex !== 'undefined' && tiers[currentTierIndex] && tiers[currentTierIndex].link) {
-        target = tiers[currentTierIndex].link;
-      } else {
-        target = window.location.href;
-      }
-    }
-
-    const checkout = new URL(target, window.location.href);
-    const params = new URLSearchParams(window.location.search);
-
-    const parametros = [
-      'utm_source',
-      'utm_campaign',
-      'utm_medium',
-      'utm_content',
-      'utm_term',
-      'utm_id',
-      'fbclid',
-      'gclid',
-      'src',
-      'sck',
-      'xcod'
-    ];
-
-    // 1. Pega os parâmetros da URL atual ou do localStorage
-    parametros.forEach(function(param) {
-      let valor = params.get(param);
-      if (!valor) {
-        try {
-          valor = localStorage.getItem('tracking_' + param) || localStorage.getItem(param);
-        } catch(e) {}
-      }
-
-      if (valor && valor !== 'null' && valor !== 'undefined') {
-        checkout.searchParams.set(param, valor);
-      }
-    });
-
-    // 2. Garante que qualquer outro parâmetro da URL também seja repassado
-    params.forEach(function(val, key) {
-      if (!checkout.searchParams.has(key) && val && val !== 'null' && val !== 'undefined') {
-        checkout.searchParams.set(key, val);
-      }
-    });
-
-    window.location.href = checkout.toString();
-  } catch (err) {
-    console.error('Erro ao redirecionar para checkout:', err);
-    if (urlCheckout) window.location.href = urlCheckout;
-  }
-}
-window.irParaCheckout = irParaCheckout;
-
 (function () {
   const parametros = [
     'utm_source',
@@ -1036,25 +978,44 @@ fbq('track', 'PageView');
 
     function irParaCheckout() {
       const current = tiers[currentTierIndex];
-      if (current && current.link) {
 
-        // Meta Ads: marca o início do checkout sem registrar uma venda antes da aprovação.
-        try {
-          if (typeof fbq === 'function') {
-            const valorCheckout = parseFloat(String(current.preco).replace('.', '').replace(',', '.'));
-            fbq('track', 'InitiateCheckout', {
-              value: isNaN(valorCheckout) ? 0 : valorCheckout,
-              currency: 'BRL',
-              content_name: current.qtd + ' números'
-            });
-          }
-        } catch (e) {}
+      if (!current || !current.link) return;
 
-        // Mantém as UTMs/IDs da campanha no link enviado ao checkout.
-        const fullUrl = window.buildCheckoutUrl ? window.buildCheckoutUrl(current.link) : current.link + (window.location.search || '');
-        window.location.href = fullUrl;
-      }
+      // Meta Ads: marca apenas o início do checkout.
+      try {
+        if (typeof fbq === 'function') {
+          const valorCheckout = parseFloat(String(current.preco).replace('.', '').replace(',', '.'));
+
+          fbq('track', 'InitiateCheckout', {
+            value: isNaN(valorCheckout) ? 0 : valorCheckout,
+            currency: 'BRL',
+            content_name: current.qtd + ' números'
+          });
+        }
+      } catch (e) {}
+
+      // Monta a URL final com UTMs e identificadores da campanha.
+      let fullUrl = current.link;
+
+      try {
+        if (typeof window.buildCheckoutUrl === 'function') {
+          fullUrl = window.buildCheckoutUrl(current.link);
+        } else if (window.location.search) {
+          const destino = new URL(current.link, window.location.href);
+          const origem = new URLSearchParams(window.location.search);
+
+          origem.forEach(function(valor, chave) {
+            if (valor) destino.searchParams.set(chave, valor);
+          });
+
+          fullUrl = destino.toString();
+        }
+      } catch (e) {}
+
+      window.location.href = fullUrl;
     }
+
+    window.irParaCheckout = irParaCheckout;
 
     function abrirModalMinhasCompras() {
       document.getElementById('modal-minhas-compras').style.display = 'flex';
